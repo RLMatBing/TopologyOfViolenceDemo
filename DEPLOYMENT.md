@@ -1,16 +1,16 @@
 # Deploy THE ASCENT to Vercel
 
 1. Push this repository to GitHub and import it into Vercel as a Next.js project.
-2. In the Vercel Marketplace, create or connect an Upstash Redis database.
-3. Set `REDIS_URL` in Vercel Project Settings → Environment Variables. Use the TLS URL supplied by Upstash. Do not expose it with a `NEXT_PUBLIC_` prefix.
+2. In the Vercel Marketplace, create or connect a free Neon Postgres database.
+3. Set `DATABASE_URL` in Vercel Project Settings → Environment Variables. Use the connection URL supplied by Neon. Do not expose it with a `NEXT_PUBLIC_` prefix.
 4. Set a long, unique `ADMIN_PASSWORD`. This protects `/admin`, the only page that can create a room.
 5. Deploy. Open `https://your-project.vercel.app/admin` to create a game, then share the generated `/lobby/[code]` link or QR code with the class. Participants use the public home page only to join a room.
 
 ## Realtime transport
 
-`/api/ws` uses `experimental_upgradeWebSocket` from `@vercel/functions`, the approach documented by Vercel for Next.js WebSocket upgrades. A connected socket remains on one Vercel Function instance. Each action is still validated and stored by the HTTP action route, then a Redis pub/sub event tells every active Function instance to refresh its connected clients. Polling the authoritative session endpoint is the reconnect and missed-event fallback.
+`/api/ws` remains an optional low-latency enhancement for clients connected to the same Function instance. Each action is validated and stored in Neon by the HTTP action route, and browsers poll the authoritative session endpoint every 1.2 seconds, so multiplayer remains correct across Vercel instances without Redis.
 
-The WebSocket API is experimental. The client does not depend on a successful socket upgrade to stay correct: it retries the socket and polls state every 1.2 seconds. Redis is required for users attached to different Vercel instances to receive the same authoritative state.
+The WebSocket API is experimental. The client does not depend on a successful socket upgrade to stay correct: it retries the socket and polls state every 1.2 seconds.
 
 ## Verify before class
 
