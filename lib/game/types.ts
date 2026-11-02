@@ -1,0 +1,12 @@
+export type Phase="lobby"|"running"|"paused"|"ended";
+export type PlayerStatus="active"|"frozen"|"exhausted";
+export type TowerStyle="standard"|"rapid"|"efficient"|"collective";
+export type Player={id:string;name:string;color:string;towerStyle:TowerStyle;styleChosen:boolean;floors:number;energy:number;status:PlayerStatus;buildReadyAt:number;restReadyAt:number;cooperateReadyAt:number;frozenUntil:number;exhaustedUntil:number;freezeCharges:number;shieldAvailable:boolean;shieldActive:boolean;overdriveUntil:number;overdriveReadyAt:number;connected:boolean;joinedAt:number};
+export type CooperationStatus="pending"|"accepted"|"declined"|"expired"|"countered";
+export type Cooperation={id:string;from:string;to:string;createdAt:number;expiresAt:number;status:CooperationStatus;kind:"standard"|"incentive";offerFloors:number};
+export type Activity={id:string;at:number;kind:"build"|"cooperate"|"offer"|"freeze"|"shield"|"overdrive"|"exhaustion"|"rest";message:string;players:string[]};
+export type Stats={builds:number;rests:number;freezes:number;freezeBlocked:number;freezeTimeMs:number;cooperationAccepted:number;cooperationDeclined:number;incentivesAccepted:number;incentivesDeclined:number;exhaustionEvents:number;exhaustionTimeMs:number;overdrives:number;overdriveBuilds:number;playersExhausted:string[];playersWhoRested:string[];playersWhoDeclined:string[]};
+export type Game={code:string;hostToken:string;phase:Phase;createdAt:number;durationSeconds:number;maxPlayers:number;startAt:number|null;endAt:number|null;pausedRemainingMs:number|null;players:Player[];cooperations:Cooperation[];activity:Activity[];stats:Stats;actionIds:string[];version:number};
+export type PublicGame=Omit<Game,"hostToken"|"actionIds">;
+export type Action={type:"build"|"rest"|"overdrive"|"shield";requestId:string}|{type:"choose-style";towerStyle:TowerStyle;requestId:string}|{type:"cooperate"|"offer-incentive"|"freeze";targetId:string;requestId:string}|{type:"cooperate-response";cooperationId:string;accept:boolean;counter?:"standard"|"two-floors";requestId:string}|{type:"start"|"pause"|"resume"|"end"|"restart";requestId:string};
+export const PALETTE=["#f5a524","#56b7ff","#ef5d72","#9d7bea","#4ed69a","#f07e3f","#e5e7ee","#58c7c1","#de7eb2","#b8d455","#ce9365","#8096ff","#ecdc7b","#dd6fbe","#8cc4ed","#c2a3f5","#f78f94","#76d7a8","#f0b05c","#b5c4d8"];
