@@ -15,4 +15,4 @@ export function proxy(request:NextRequest){
  const response=NextResponse.next();response.headers.set("Cache-Control","private, no-store");return response;
 }
 
-export const config={matcher:["/admin/:path*"]};
+export const config={matcher:["/admin/:path*","/api/sessions"]};
