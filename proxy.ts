@@ -11,8 +11,12 @@ export function proxy(request:NextRequest){
  const expected=`admin:${password}`;
  let valid=false;
  try{valid=Boolean(authorization?.startsWith("Basic ")&&atob(authorization.slice(6))===expected);}catch{/* malformed credentials */}
+ const session=request.cookies.get("ascent_admin")?.value;
+ if(!valid&&session){try{valid=atob(session)===expected;}catch{/* malformed cookie */}}
  if(!valid)return new NextResponse("Authentication required",{status:401,headers:{"WWW-Authenticate":'Basic realm="The Ascent Admin", charset="UTF-8"',"Cache-Control":"no-store"}});
- const response=NextResponse.next();response.headers.set("Cache-Control","private, no-store");return response;
+ const response=NextResponse.next();response.headers.set("Cache-Control","private, no-store");
+ if(authorization?.startsWith("Basic "))response.cookies.set("ascent_admin",btoa(expected),{httpOnly:true,sameSite:"lax",secure:request.nextUrl.protocol==="https:",path:"/",maxAge:60*60*12});
+ return response;
 }
 
 export const config={matcher:["/admin/:path*","/api/sessions"]};
