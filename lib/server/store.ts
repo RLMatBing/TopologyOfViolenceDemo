@@ -14,7 +14,7 @@ let sqlClient: Sql<Record<string, unknown>> | undefined;
 
 function database() {
   if (!databaseUrl) return null;
-  sqlClient ??= postgres(databaseUrl, { max: 1, prepare: false, idle_timeout: 20 });
+  sqlClient ??= postgres(databaseUrl, { max: 3, prepare: false, idle_timeout: 20 });
   return sqlClient;
 }
 
@@ -78,7 +78,7 @@ export async function mutateRoom<T>(code: string, mutate: (game: Game) => T | Pr
     local.set(code, game);
     return result;
   }
-  for (let retry = 0; retry < 6; retry += 1) {
+  for (let retry = 0; retry < 24; retry += 1) {
     const rows = await db`SELECT game, version FROM ascent_rooms WHERE code = ${code} AND expires_at > NOW()`;
     const row = rows[0] as { game: Game; version: number } | undefined;
     if (!row) throw new Error("Room not found");
@@ -91,6 +91,7 @@ export async function mutateRoom<T>(code: string, mutate: (game: Game) => T | Pr
       RETURNING code
     `;
     if (updated.length) return result;
+    await new Promise((resolve) => setTimeout(resolve, 15 + retry * 10));
   }
   throw new Error("The room is busy. Try that again.");
 }
