@@ -65,7 +65,6 @@ export async function getRoom(code: string) {
   requireProductionDatabase();
   const db = database();
   if (!db) return local.get(code) || null;
-  await ensureSchema();
   const rows = await db`SELECT game FROM ascent_rooms WHERE code = ${code} AND expires_at > NOW()`;
   return rows[0] ? decodeGame(rows[0].game) : null;
 }
@@ -80,7 +79,6 @@ export async function mutateRoom<T>(code: string, mutate: (game: Game) => T | Pr
     local.set(code, game);
     return result;
   }
-  await ensureSchema();
   for (let retry = 0; retry < 6; retry += 1) {
     const rows = await db`SELECT game, version FROM ascent_rooms WHERE code = ${code} AND expires_at > NOW()`;
     const row = rows[0] as { game: Game; version: number } | undefined;
