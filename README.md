@@ -12,7 +12,7 @@ npm run dev
 npm test
 ```
 
-Open `http://localhost:3000`. For durable multi-device or Vercel testing, set `DATABASE_URL` in `.env.local` to a Neon Postgres connection URL. Without it, local development uses an in-memory room store, which works only inside that one local process.
+Open `http://localhost:3000`. For durable multi-device or Vercel testing, set `DATABASE_URL` in `.env.local` to a Supabase or other Postgres connection URL. Without it, local development uses an in-memory room store, which works only inside that one local process.
 
 ## Routes
 
@@ -38,4 +38,4 @@ All gameplay actions are submitted as server intentions. The route handler valid
 
 ## Production deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md). Use free Neon Postgres in production. Database URLs and host tokens remain server-side; browser clients receive a session scoped player token only.
+See [DEPLOYMENT.md](./DEPLOYMENT.md). Use free hosted Postgres in production. Database URLs and host tokens remain server-side; browser clients receive a session scoped player token only.

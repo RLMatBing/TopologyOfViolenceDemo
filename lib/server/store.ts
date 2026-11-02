@@ -1,18 +1,21 @@
 import "server-only";
-import { neon } from "@neondatabase/serverless";
+import postgres, { type Sql } from "postgres";
 import { createGame } from "../game/rules";
 import type { Game } from "../game/types";
 
-// Neon is available on a free tier and works with Vercel's serverless runtime.
-// The polling client already keeps every browser current, so Redis pub/sub is
-// not needed for gameplay correctness.
+// Any standard Postgres provider works here (Supabase, Neon, or another free
+// hosted Postgres). The polling client keeps every browser current, so Redis
+// pub/sub is not needed for gameplay correctness.
 const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.NEON_DATABASE_URL;
 const roomRegistry = globalThis as typeof globalThis & { __ascentRooms?: Map<string, Game> };
 const local = roomRegistry.__ascentRooms ?? (roomRegistry.__ascentRooms = new Map<string, Game>());
 let schemaReady: Promise<void> | undefined;
+let sqlClient: Sql<Record<string, unknown>> | undefined;
 
 function database() {
-  return databaseUrl ? neon(databaseUrl) : null;
+  if (!databaseUrl) return null;
+  sqlClient ??= postgres(databaseUrl, { max: 1, prepare: false, idle_timeout: 20 });
+  return sqlClient;
 }
 
 function requireProductionDatabase() {

@@ -1,8 +1,8 @@
 # Deploy THE ASCENT to Vercel
 
 1. Push this repository to GitHub and import it into Vercel as a Next.js project.
-2. In the Vercel Marketplace, create or connect a free Neon Postgres database.
-3. Set `DATABASE_URL` in Vercel Project Settings → Environment Variables. Use the connection URL supplied by Neon. Do not expose it with a `NEXT_PUBLIC_` prefix.
+2. Create a free Supabase Postgres database (or another hosted Postgres provider).
+3. Set `DATABASE_URL` in Vercel Project Settings → Environment Variables. Use the provider's pooled connection URL. Do not expose it with a `NEXT_PUBLIC_` prefix.
 4. Set a long, unique `ADMIN_PASSWORD`. This protects `/admin`, the only page that can create a room.
 5. Deploy. Open `https://your-project.vercel.app/admin` to create a game, then share the generated `/lobby/[code]` link or QR code with the class. Participants use the public home page only to join a room.
 
