@@ -50,7 +50,6 @@ export async function createRoom(code: string, hostToken: string, duration: numb
     local.set(code, game);
     return game;
   }
-  await ensureSchema();
   const rows = await db`
     INSERT INTO ascent_rooms (code, game, version, expires_at)
     VALUES (${code}, ${JSON.stringify(game)}::jsonb, ${game.version}, NOW() + INTERVAL '24 hours')
