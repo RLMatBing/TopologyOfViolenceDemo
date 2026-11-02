@@ -18,6 +18,10 @@ function database() {
   return sqlClient;
 }
 
+function decodeGame(value: unknown) {
+  return (typeof value === "string" ? JSON.parse(value) : value) as Game;
+}
+
 function requireProductionDatabase() {
   if (process.env.VERCEL && !databaseUrl) {
     throw new Error("A free Neon Postgres connection is required for production multiplayer. Set DATABASE_URL in Vercel.");
@@ -63,7 +67,7 @@ export async function getRoom(code: string) {
   if (!db) return local.get(code) || null;
   await ensureSchema();
   const rows = await db`SELECT game FROM ascent_rooms WHERE code = ${code} AND expires_at > NOW()`;
-  return rows[0] ? (rows[0].game as Game) : null;
+  return rows[0] ? decodeGame(rows[0].game) : null;
 }
 
 export async function mutateRoom<T>(code: string, mutate: (game: Game) => T | Promise<T>): Promise<T> {
@@ -81,7 +85,7 @@ export async function mutateRoom<T>(code: string, mutate: (game: Game) => T | Pr
     const rows = await db`SELECT game, version FROM ascent_rooms WHERE code = ${code} AND expires_at > NOW()`;
     const row = rows[0] as { game: Game; version: number } | undefined;
     if (!row) throw new Error("Room not found");
-    const game = row.game;
+    const game = decodeGame(row.game);
     const result = await mutate(game);
     const updated = await db`
       UPDATE ascent_rooms
